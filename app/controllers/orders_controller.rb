@@ -41,9 +41,9 @@ class OrdersController < ApplicationController
       all_responses << response
     end
 
-    # take est delivery out of UPS GROUND (nil)
     ship_types = all_responses.flatten!(1).group_by{ |array| array.first }
-    
+
+    # take est delivery out of UPS GROUND (nil)
     ship_types.each do |key, costs|
       ship_types[key].flatten!.delete_if{|o| o.class == String || o.class == NilClass}
     end
@@ -93,13 +93,6 @@ class OrdersController < ApplicationController
   def confirmation
     flash.keep
     @order = Order.find(flash[:confirmed_order_id])
-
-    @shipping_cost = @order.shipping.match(/\$(\d+\.\d+)/)[0]
-    @grand_total_cost = (@order.final_total/100.00) + @shipping_cost[1..-1].to_f
-
-    @delivery_date = @order.shipping.match(/EDD:\s\w+\/\d+/) ? @order.shipping.match(/EDD:\s\w+\/\d+/)[0] : "Unknown"
-    # use the below line for debugging (to avoid losing the flash[:confirmed_order_id])
-    # @order = Order.find(12)
   end
 
   def cancel
@@ -154,7 +147,7 @@ class OrdersController < ApplicationController
     end
   end
 
-  private
+  private ######################################################################
 
   def order_params
     params.require(:order).permit(:status, :email, :cc_name, :cc_number,
